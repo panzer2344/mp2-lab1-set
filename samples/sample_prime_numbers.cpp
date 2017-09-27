@@ -14,7 +14,14 @@
 
 #include "tbitfield.h"
 
-int main()
+int main() {
+	TBitField tbf(32);
+	cin >> tbf;
+	cout << tbf;
+	getchar();
+}
+
+int main1()
 {
   int n, m, k, count;
 
