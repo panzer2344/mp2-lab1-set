@@ -14,14 +14,24 @@
 
 #include "tbitfield.h"
 
-int main() {
-	TBitField tbf(32);
-	cin >> tbf;
-	cout << tbf;
-	getchar();
+int main1() {
+	TBitField bf(10), bf1(10);
+	cin >> bf;
+	bf1 = bf;
+	
+	cout << bf.GetLength() << " " << bf1.GetLength() << endl;
+	cout << "original =" << bf << endl;
+	cout << "nigatiation = " << bf1 << endl;
+	cout << "is equel: " << (bf1 == bf) << endl;
+	cout << "or no: " << (bf1 != bf) << endl;
+	
+	//char tmp;
+	//cin >> tmp;
+
+	return 0;
 }
 
-int main1()
+int main()
 {
   int n, m, k, count;
 
@@ -56,6 +66,8 @@ int main1()
     }
   cout << endl;
   cout << "В первых " << n << " числах " << count << " простых" << endl;
+
+  return 0;
 }
 #else
 
