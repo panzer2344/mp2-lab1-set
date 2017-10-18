@@ -8,10 +8,11 @@
 #include "tbitfield.h"
 #include <string>
 
-TBitField::TBitField(int len)
+TBitField::TBitField(int len=10)
 {
+	if (len < 1) throw len;
 	BitLen = len;
-	MemLen = BitLen / (sizeof(TELEM)*8 + 1) + 1;
+	MemLen = BitLen / (sizeof(TELEM)*8) + 1;
 	pMem = new TELEM[MemLen];
 
 	for (int i = 0; i < MemLen; i++) {
@@ -123,18 +124,32 @@ int TBitField::operator!=(const TBitField &bf) const // сравнение
 
 TBitField TBitField::operator|(const TBitField &bf) // операция "или"
 {
-	TBitField tbf(BitLen);
+	TBitField tbf;
 
-	for (int i = 0; i < MemLen; i++) tbf.pMem[i] = pMem[i] | bf.pMem[i];
-
+	if(BitLen > bf.BitLen){
+		tbf = *this;
+		for (int i = 0; i < bf.BitLen; i++) tbf.pMem[i] |= bf.pMem[i];
+	}
+	else if(BitLen <= bf.BitLen) {
+		tbf = bf;
+		for (int i = 0; i < BitLen; i++) tbf.pMem[i] |= pMem[i];
+	}
+	
 	return tbf;
 }
 
 TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 {
-	TBitField tbf(BitLen);
+	TBitField tbf(1);
 
-	for (int i = 0; i < MemLen; i++) tbf.pMem[i] = pMem[i] & bf.pMem[i];
+	if (BitLen > bf.BitLen) {
+		tbf = *this;
+		for (int i = 0; i < bf.BitLen; i++) tbf.pMem[i] &= bf.pMem[i];
+	}
+	else if (BitLen <= bf.BitLen) {
+		tbf = bf;
+		for (int i = 0; i < BitLen; i++) tbf.pMem[i] &= pMem[i];
+	}
 
 	return tbf;
 }
@@ -164,8 +179,11 @@ istream &operator>>(istream &istr, TBitField &bf) // ввод
 
 ostream &operator<<(ostream &ostr, const TBitField &bf) // вывод
 {
-	for (int j = 0; j < bf.BitLen; j++) {
+	/*for (int j = 0; j < bf.BitLen; j++) {
 		ostr << bf.GetBit(j);
+	}*/
+	for (int i = 0; i < bf.BitLen; i++) {
+		if (bf.GetBit(i)) ostr << i << " ";
 	}
 	return ostr;
 }

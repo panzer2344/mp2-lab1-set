@@ -7,14 +7,14 @@
 
 #include <iomanip>
 
-// #define USE_SET // Использовать класс TSet,
+#define USE_SET // Использовать класс TSet,
                 // закоментировать, чтобы использовать битовое поле
 
 #ifndef USE_SET // Использовать класс TBitField
 
 #include "tbitfield.h"
 
-int main1() {
+/*int main1() {
 	TBitField bf(10), bf1(10);
 	cin >> bf;
 	bf1 = bf;
@@ -29,7 +29,7 @@ int main1() {
 	//cin >> tmp;
 
 	return 0;
-}
+}*/
 
 int main()
 {
