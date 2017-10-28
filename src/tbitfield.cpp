@@ -8,9 +8,9 @@
 #include "tbitfield.h"
 #include <string>
 
-TBitField::TBitField(int len=10)
+TBitField::TBitField(int len)
 {
-	if (len < 1) throw len;
+	if (len < 0) throw len;
 	BitLen = len;
 	MemLen = BitLen / (sizeof(TELEM)*8) + 1;
 	pMem = new TELEM[MemLen];
@@ -24,6 +24,7 @@ TBitField::TBitField(const TBitField &bf) // конструктор копиро
 {
 	BitLen = bf.BitLen;
 	MemLen = bf.MemLen;
+	//if ( !bf. MemLen || !bf.BitLen) throw - 1;
 	pMem = new TELEM[MemLen];
 
 	for (int i = 0; i < MemLen; i++) {
@@ -77,6 +78,7 @@ int TBitField::GetBit(const int n) const // получить значение б
 
 TBitField& TBitField::operator=(const TBitField &bf) // присваивание
 {	
+	//if (!bf.BitLen || !bf.MemLen) throw - 1;
 	if (BitLen != bf.BitLen) {
 		delete[] pMem;
 		BitLen = bf.BitLen;
@@ -128,11 +130,11 @@ TBitField TBitField::operator|(const TBitField &bf) // операция "или"
 
 	if(BitLen > bf.BitLen){
 		tbf = *this;
-		for (int i = 0; i < bf.BitLen; i++) tbf.pMem[i] |= bf.pMem[i];
+		for (int i = 0; i < bf.MemLen; i++) tbf.pMem[i] |= bf.pMem[i];
 	}
 	else if(BitLen <= bf.BitLen) {
 		tbf = bf;
-		for (int i = 0; i < BitLen; i++) tbf.pMem[i] |= pMem[i];
+		for (int i = 0; i < MemLen; i++) tbf.pMem[i] |= pMem[i];
 	}
 	
 	return tbf;
@@ -144,11 +146,13 @@ TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 
 	if (BitLen > bf.BitLen) {
 		tbf = *this;
-		for (int i = 0; i < bf.BitLen; i++) tbf.pMem[i] &= bf.pMem[i];
+		for (int i = 0; i < bf.MemLen; i++) tbf.pMem[i] &= bf.pMem[i];
+		for (int i = bf.MemLen; i < MemLen; i++) tbf.pMem[i] = 0;
 	}
 	else if (BitLen <= bf.BitLen) {
 		tbf = bf;
-		for (int i = 0; i < BitLen; i++) tbf.pMem[i] &= pMem[i];
+		for (int i = 0; i < MemLen; i++) tbf.pMem[i] &= pMem[i];
+		for (int i = MemLen; i < bf.MemLen; i++) tbf.pMem[i] = 0;
 	}
 
 	return tbf;
@@ -157,8 +161,11 @@ TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 TBitField TBitField::operator~(void) // отрицание
 {
 	TBitField tbf(BitLen);
+	int BitInByte = sizeof(TELEM) * 8,
+		mask = INT_MAX >> (BitInByte - (BitLen % BitInByte + 1));
 
-	for (int i = 0; i < MemLen; i++) tbf.pMem[i] = ~pMem[i];
+	for (int i = 0; i < MemLen-1; i++) tbf.pMem[i] = ~pMem[i];
+	tbf.pMem[MemLen - 1] = mask & ~pMem[MemLen - 1];
 
 	return tbf;
 }
